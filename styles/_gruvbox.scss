@@ -1,0 +1,79 @@
+// Need fonts
+@use 'variables' as *;
+@use 'font/fantasque';
+
+// --- THEME ---
+* {
+  border-color: #909396 !important;
+}
+a {
+  color: $red !important;
+}
+a.active {
+  color: $orange !important;
+}
+body {
+  background-color: $background !important;
+  color: $foreground !important;
+}
+html {
+  background-color: $background !important;
+}
+input,
+textarea {
+  background-color: $background !important;
+  color: $foreground !important;
+}
+blockquote,
+pre {
+  background-color: $background !important;
+  color: $foreground !important;
+}
+* {
+  border-color: $foreground !important;
+}
+a {
+  color: $red !important;
+}
+//a:visited {
+//  color: $orange !important;
+//}
+body {
+  background-color: $background !important;
+  color: $foreground !important;
+}
+html {
+  background-color: $background !important;
+}
+input,
+textarea {
+  background-color: $background !important;
+  color: $foreground !important;
+}
+blockquote,
+pre {
+  background-color: $background !important;
+  color: $foreground !important;
+}
+
+// 
+
+hr {
+	position: relative;
+	height: 20px;
+	overflow: hidden;
+	border: 0;
+	margin: 20px 0;
+}
+hr::after {
+	content: "---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
+	position: absolute;
+	top: 0;
+	left: 0;
+	line-height: 20px;
+	width: 100%;
+	word-wrap: break-word;
+}
+* {
+	text-rendering: geometricPrecision;
+}

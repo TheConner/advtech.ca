@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+  <h1>👋 Under Construction</h1>
+  <p>We are doing some remodelling</p>
+  {% for post in posts %} 
+    <div>
+      <h2>
+        <a href="{{ post.slug }}">{{ post.title }}</a>
+      </h2>
+      <small>{{ post.date }}</small>
+    </div>
+  {% endfor %}
+{% endblock %}

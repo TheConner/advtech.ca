@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="generator" content="piece of shit">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
+
+    {% block head %}
+    <title>{% block title %}{% endblock title %} - {{ website_name }}</title>
+    {% endblock head %}
+</head>
+
+<body>
+    {% block header %}
+    <pre class="logo-bg"><code class="logo">
+      .o.       oooooooooo.   oooooo     oooo ooooooooooooo                     oooo        
+     .888.      `888'   `Y8b   `888.     .8'  8'   888   `8                     `888        
+    .8"888.      888      888   `888.   .8'        888       .ooooo.   .ooooo.   888 .oo.   
+   .8' `888.     888      888    `888. .8'         888      d88' `88b d88' `"Y8  888P"Y88b  
+  .88ooo8888.    888      888     `888.8'          888      888ooo888 888        888   888  
+ .8'     `888.   888     d88'      `888'           888      888    .o 888   .o8  888   888  
+o88o     o8888o o888bood8P'         `8'           o888o     `Y8bod8P' `Y8bod8P' o888o o888o 
+</code></pre>
+    {% endblock header %}
+    {% block nav %}
+    <nav class="nav">
+        {% for entry in nav_entries %}
+            <a href="{{ entry.slug }}">{{ entry.name }}</a>
+            {% if loop.last != true %}
+                <span>|</span>
+            {% endif %}
+        {% endfor %}
+    </nav>
+    {% endblock nav %}
+    <div id="content">{% block content %}{% endblock content %}</div>
+    
+    <footer id="footer">
+    {% block footer %}
+    &copy; Copyright {{ current_year }} by <a href="/about">{{author_given_name}} {{author_family_name}}</a>.
+    {% endblock footer %}
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+.bio {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+
+  & > h1, h2 {
+    margin-top: 0;
+  }
+
+  .bio-avatar {
+    border-radius: 8px;
+    max-width: 10vw;
+  }
+  .bio-socials {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 1rem;
+    a {
+      margin-right: 1rem;
+    }
+  }
+}

@@ -1,0 +1,26 @@
+# 
+# Website Configuration
+# 
+output_dir = "output"
+
+[website]
+name = "ADVTech"
+href = "https://advtech.ca"
+
+[website.author]
+id = "conner"
+given_name = "Conner"
+family_name = "Bradley"
+
+[[website.nav]]
+name = "Home"
+slug = "/"
+
+[[website.nav]]
+name = "About"
+slug = "/about"
+
+
+# Render options overrideable
+[render]
+include_draft = false # overrideable by cli
