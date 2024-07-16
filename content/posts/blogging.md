@@ -12,7 +12,7 @@ As a result, I am working on cleaning up my website. Most of my old posts have b
 
 I don't really think I needed to write my own static site generator, I instead did it for fun, and now I don't have to worry about my engine being adopted by a company and development stagnating. If development stagnates on my own engine I only have myself to blame, which is fine.
 
-My site generator is written in Rust, with sources [here](todo). If you want a half decent SSG with good features, check out [Astro](https://astro.build/) or [Zola](https://www.getzola.org/). 
+My site generator is written in Rust, with sources [here](https://gitlab.advtech.ca/netwinder/advtech.ca) ([mirror](https://github.com/TheConner/advtech.ca)). It is really not that good, it's more of a pet project than a serious attempt at a good SSG. If you want a half decent SSG with good features, check out [Astro](https://astro.build/) or [Zola](https://www.getzola.org/). 
 
 
 ## Footnotes
