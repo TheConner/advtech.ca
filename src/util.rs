@@ -1,4 +1,5 @@
-use std::path::Path;
+use std::ffi::OsStr;
+use std::path::{Path, PathBuf};
 use std::{io, fs};
 
 use rand::distributions::{Alphanumeric, DistString};
@@ -17,6 +18,10 @@ pub fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<
   Ok(())
 }
 
-pub fn gen_cache_buster() -> String {
-    Alphanumeric.sample_string(&mut rand::thread_rng(), 8)
+pub fn gen_cache_buster(path: &mut PathBuf) -> &mut PathBuf {
+    let stem = path.file_stem().unwrap_or(OsStr::new("")).to_str().unwrap_or("");
+    let ext = path.extension().unwrap_or(OsStr::new("")).to_str().unwrap_or("");
+    let buster = Alphanumeric.sample_string(&mut rand::thread_rng(), 8);
+    path.set_file_name(format!("{stem}.{buster}.{ext}"));
+    path
 }

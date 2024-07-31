@@ -3,6 +3,7 @@ use comrak::nodes::NodeValue;
 use comrak::parse_document;
 use comrak::Arena;
 use regex::Regex;
+use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
 use std::io;
@@ -18,14 +19,17 @@ use comrak::Options;
 use crate::config::PostMetadata;
 use crate::templates::TEMPLATES;
 use crate::util::copy_dir_all;
+use crate::util::gen_cache_buster;
 use crate::website::Website;
 
 fn get_renderable_files(base_dir: &Path) -> impl Iterator<Item = DirEntry> {
     WalkDir::new(base_dir)
         .into_iter()
         .map(|result| result.unwrap())
-        .filter(|entry| entry.path().is_file() && entry.path().extension().is_some_and(|e| e.eq("md")))
-    }
+        .filter(|entry| {
+            entry.path().is_file() && entry.path().extension().is_some_and(|e| e.eq("md"))
+        })
+}
 
 pub fn clear_output() -> io::Result<()> {
     fs::remove_dir_all(Path::new("./output"))
@@ -37,7 +41,7 @@ pub fn render_content(base_dir: &Path, website: &Website) -> Vec<PostMetadata> {
     let mut post_metadatas = vec![];
     for mut post in posts {
         if let Ok(meta_opt) = post.render(&website, false) {
-            if let Some(meta) = meta_opt  {
+            if let Some(meta) = meta_opt {
                 post_metadatas.push(meta);
             }
         }
@@ -71,7 +75,7 @@ fn extract_header(text: &str) -> Option<SplitPost> {
 
 struct Post {
     file: DirEntry,
-    assets: Vec<PathBuf>,
+    assets: HashMap<PathBuf, PathBuf>,
     pub metadata: Option<PostMetadata>,
 }
 
@@ -80,8 +84,19 @@ impl Post {
         Post {
             file: file,
             metadata: None,
-            assets: vec![]
+            assets: HashMap::new(),
         }
+    }
+
+    fn add_asset(&mut self, path: &PathBuf) {
+        let mut src_path = path.clone();
+        
+        // Determine output path
+        let out_path = gen_cache_buster(&mut src_path);
+        let out_path = out_path.clone();
+
+        // Map src to dest
+        self.assets.insert(path.clone(), out_path);
     }
 
     fn render_md(&mut self, document: &str) -> String {
@@ -97,10 +112,14 @@ impl Post {
             if let NodeValue::Image(ref mut img) = node.data.borrow_mut().value {
                 // TODO: external vs internal images
                 let path = Path::new(&img.url);
-                self.assets.push(path.to_path_buf());
+                let mut src_path_buf = path.to_path_buf();
+                
+                self.add_asset(&mut src_path_buf);
+
+                let out_path = self.assets.get(&src_path_buf).unwrap();
+                img.url = out_path.clone().into_os_string().into_string().unwrap();
             }
         }
-
 
         let mut html = vec![];
         format_html(root, &options, &mut html).unwrap();
@@ -110,7 +129,11 @@ impl Post {
 
     /// Renders a post
     /// TODO: make include_draft an options struct
-    pub fn render(&mut self, website: &Website, include_draft: bool) -> std::io::Result<Option<PostMetadata>> {
+    pub fn render(
+        &mut self,
+        website: &Website,
+        include_draft: bool,
+    ) -> std::io::Result<Option<PostMetadata>> {
         let path = self.file.path().display();
 
         println!("-> render post {path}");
@@ -128,10 +151,14 @@ impl Post {
         }
 
         if let Some(assets) = &metadata.assets {
-            let mut asset_paths: Vec<PathBuf> = assets.into_iter()
+            let mut asset_paths: Vec<PathBuf> = assets
+                .into_iter()
                 .map(|a| PathBuf::from_str(a.as_str()).unwrap())
                 .collect::<Vec<PathBuf>>();
-            self.assets.append(&mut asset_paths);
+
+            for mut ele in asset_paths {
+                self.add_asset(&mut ele);
+            }
         }
 
         let html = self.render_md(&split_post.body);
@@ -152,16 +179,15 @@ impl Post {
         post_out.write_all(rendered_post.as_bytes())?;
 
         // Output assets
-        for asset_path in &self.assets {
-            let asset_src = self.file.path().parent().unwrap().join(asset_path);
+        for (asset_src_path, asset_dest_path) in &self.assets {
+            let asset_src = self.file.path().parent().unwrap().join(asset_src_path);
             let asset_src_str = asset_src.to_str().unwrap_or("");
 
-            let asset_dest = dir_path.join(asset_path);
-            let asset_dest_str = asset_dest.to_str().unwrap_or("");
+            let mut asset_path = dir_path.join(asset_dest_path);
+            let asset_dest_str = asset_path.to_str().unwrap_or("");
             println!("--> Copy {asset_src_str} to {asset_dest_str}");
-            fs::copy(asset_src, asset_dest).expect("Error copying asset!");
+            fs::copy(asset_src, asset_path).expect("Error copying asset!");
         }
-
 
         Ok(Some(metadata))
     }
@@ -180,16 +206,19 @@ pub fn render_index(website: &Website, posts: Vec<PostMetadata>) -> io::Result<(
 }
 
 pub fn render_styles() -> io::Result<()> {
-    let scss = grass::from_path("./styles/theme.scss", &grass::Options::default()).expect("styles are fucked");
+    let scss = grass::from_path("./styles/theme.scss", &grass::Options::default())
+        .expect("styles are fucked");
     let out_path = Path::new("./output/css");
     fs::create_dir_all(out_path).expect("Could not create style output");
 
     // TODO: make this less jank
-    copy_dir_all("./styles/font/glasstty", "./output/font").expect("Copying rendered styles blew up");
-    copy_dir_all("./styles/font/fantasque", "./output/font/fantasque").expect("Copying rendered styles blew up");
+    copy_dir_all("./styles/font/glasstty", "./output/font")
+        .expect("Copying rendered styles blew up");
+    copy_dir_all("./styles/font/fantasque", "./output/font/fantasque")
+        .expect("Copying rendered styles blew up");
 
     let mut out_file = File::create(out_path.join(Path::new("main.css")))?;
     out_file.write_all(scss.as_bytes())?;
-    
+
     Ok(())
 }
