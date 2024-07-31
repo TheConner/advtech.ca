@@ -45,7 +45,7 @@ pub struct PostMetadata {
     date: Option<String>,
     // Does not render when true
     draft: Option<bool>,
-    pub tags: Option<Vec<String>>
+    pub tags: Vec<String>
 }
 impl PostMetadata {
     pub fn parse_date(&self) -> Option<NaiveDate> {
