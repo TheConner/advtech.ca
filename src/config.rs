@@ -37,11 +37,15 @@ pub struct NavEntry {
 pub struct PostMetadata {
     pub title: String,
     pub slug: String,
+    // Hides from listing
     pub internal: Option<bool>,
+    // Extra assets that may not get picked up by image tags and whatnot
     pub assets: Option<Vec<String>>,
     // Internal date field, use parse_date to get more info
     date: Option<String>,
+    // Does not render when true
     draft: Option<bool>,
+    pub tags: Option<Vec<String>>
 }
 impl PostMetadata {
     pub fn parse_date(&self) -> Option<NaiveDate> {
