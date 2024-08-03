@@ -2,7 +2,7 @@
 title = "About"
 slug = "about"
 internal = true
-assets = ["Conner.png"]
+tags = []
 ---
 
 <div class="bio">
@@ -15,8 +15,10 @@ assets = ["Conner.png"]
 - [LinkedIn](https://www.linkedin.com/in/conner-bradley/)
 
   </div>
-  <div>
-    <img src="Conner.png" class="bio-avatar">
+  <div class="bio-avatar">
+
+![Conner](Conner.png)
+
   </div>
 </div>
 

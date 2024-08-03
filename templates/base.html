@@ -14,6 +14,7 @@
 </head>
 
 <body>
+    <header>
     {% block header %}
     <pre class="logo-bg"><code class="logo">
       .o.       oooooooooo.   oooooo     oooo ooooooooooooo                     oooo        
@@ -35,6 +36,8 @@ o88o     o8888o o888bood8P'         `8'           o888o     `Y8bod8P' `Y8bod8P' 
         {% endfor %}
     </nav>
     {% endblock nav %}
+    </header>
+    
     <div id="content">{% block content %}{% endblock content %}</div>
     
     <footer id="footer">

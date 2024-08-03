@@ -1,0 +1,22 @@
+{% macro post_entry(post) %}
+<div>
+  <h2>
+    <a href="/{{ post.slug }}">{{ post.title }}</a>
+  </h2>
+  <small>Date: {{ post.date | date(format="%B %d %Y")}}</small>
+
+  {% set tag_len = post.tags | length %}
+    {% if tag_len > 0 %}
+      <span>
+        Tags: 
+        {% for tag in post.tags %}
+          <a href="/tags/{{tag}}">{{tag}}</a>
+          {% if not loop.last %}
+            ,
+          {% endif %}
+        {% endfor %}
+      </span>
+    {% endif %}
+  
+</div>
+{% endmacro post_entry%}

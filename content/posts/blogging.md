@@ -2,6 +2,7 @@
 title = "On Blogging"
 slug = "posts/on-blogging"
 date = "2024-07-16"
+tags = ["meta"]
 ---
 
 I have decided to revisit putting my musings out here. In the past, I found a variety of different meanings in writing about various topics and putting them out into the void for others to consume. It was primarily enjoyable as an exercise to learn and share information. 

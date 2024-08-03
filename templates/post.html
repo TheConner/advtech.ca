@@ -1,8 +1,18 @@
 {% extends "base.html" %}
 {% block title %}{{title}}{% endblock %}
 {% block content %}
-  <div class="post">
+  <article>
     <h1>{{ title }}</h1>
+    {% set tag_len = tags | length %}
+    {% if tag_len > 0 %}
+      <p class="subtitle">
+        Tags: 
+        {% for tag in tags %}
+          <a href="/tags/{{tag}}">{{tag}}</a>
+        {% endfor %}
+      </p>
+    {% endif %}
+    
     {{ content | safe }}
-  </div>
+  </article>
 {% endblock %}

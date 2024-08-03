@@ -67,3 +67,9 @@ impl PostMetadata {
         false
     }
 }
+
+// pub struct PageView {
+//     pub title: String,
+//     pub slug: String,
+//     pub date: Option<String>,
+// }

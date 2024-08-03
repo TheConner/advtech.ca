@@ -8,8 +8,10 @@
   }
 
   .bio-avatar {
-    border-radius: 8px;
-    max-width: 10vw;
+    img {
+      border-radius: 8px;
+      max-width: 10vw;
+    }
   }
   .bio-socials {
     display: flex;

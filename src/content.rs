@@ -40,10 +40,9 @@ pub fn render_content(base_dir: &Path, website: &Website) -> Vec<PostMetadata> {
 
     let mut post_metadatas = vec![];
     for mut post in posts {
-        if let Ok(meta_opt) = post.render(&website, false) {
-            if let Some(meta) = meta_opt {
-                post_metadatas.push(meta);
-            }
+        post.render(&website, false).expect("Could not render post");
+        if let Some(meta) = post.metadata {
+            post_metadatas.push(meta);
         }
     }
     post_metadatas
@@ -133,7 +132,7 @@ impl Post {
         &mut self,
         website: &Website,
         include_draft: bool,
-    ) -> std::io::Result<Option<PostMetadata>> {
+    ) -> std::io::Result<()> {
         let path = self.file.path().display();
 
         println!("-> render post {path}");
@@ -147,11 +146,11 @@ impl Post {
 
         // If this post is a draft, only continue if include_draft is set
         if metadata.is_draft() && !include_draft {
-            return Ok(None);
+            return Ok(());
         }
 
         if let Some(assets) = &metadata.assets {
-            let mut asset_paths: Vec<PathBuf> = assets
+            let asset_paths: Vec<PathBuf> = assets
                 .into_iter()
                 .map(|a| PathBuf::from_str(a.as_str()).unwrap())
                 .collect::<Vec<PathBuf>>();
@@ -166,6 +165,7 @@ impl Post {
 
         context.insert("content", &html);
         context.insert("title", &metadata.title);
+        context.insert("tags", &metadata.tags);
 
         let rendered_post = TEMPLATES.render("post.html", &context).unwrap();
 
@@ -183,14 +183,49 @@ impl Post {
             let asset_src = self.file.path().parent().unwrap().join(asset_src_path);
             let asset_src_str = asset_src.to_str().unwrap_or("");
 
-            let mut asset_path = dir_path.join(asset_dest_path);
+            let asset_path = dir_path.join(asset_dest_path);
             let asset_dest_str = asset_path.to_str().unwrap_or("");
             println!("--> Copy {asset_src_str} to {asset_dest_str}");
             fs::copy(asset_src, asset_path).expect("Error copying asset!");
         }
 
-        Ok(Some(metadata))
+        self.metadata = Some(metadata);
+
+        Ok(())
     }
+}
+
+pub fn render_tags(website: &Website, posts: Vec<PostMetadata>) -> io::Result<()> {
+    // Reduce all tags into a map of tag -> [post]
+    let mut tag_map: HashMap<String, Vec<PostMetadata>> = HashMap::new();
+
+    for ele in posts {
+        let cl_meta = ele.clone();
+        for tag in ele.tags {
+            match tag_map.get_mut(&tag) {
+                Some(vec) => {
+                    vec.push(cl_meta.clone());
+                },
+                None => {
+                    tag_map.insert(tag, Vec::from([cl_meta.clone()]));
+                }
+            }
+        }
+    }
+
+    for (tag, posts) in tag_map {
+        let mut context = website.render_context();
+        context.insert("posts", &posts);
+        context.insert("tag", &tag);
+        let rendered = TEMPLATES.render("tags.html", &context).unwrap();
+        let base_output_path_str = format!("output/tags/{tag}");
+        let base_output_path = Path::new(&base_output_path_str);
+        fs::create_dir_all(base_output_path).expect("Could not create base output path");
+        let mut out_file = File::create(base_output_path.join(Path::new("index.html")))?;
+        out_file.write_all(rendered.as_bytes())?;
+    }
+
+    Ok(())
 }
 
 pub fn render_index(website: &Website, posts: Vec<PostMetadata>) -> io::Result<()> {

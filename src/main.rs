@@ -4,6 +4,7 @@ use std::path::Path;
 
 use config::PostMetadata;
 use content::render_styles;
+use content::render_tags;
 
 mod config;
 mod content;
@@ -51,6 +52,10 @@ fn render(website: Website) -> io::Result<()> {
             }
         })
         .collect();
+
+    // All posts rendered, render tag summary pages
+    render_tags(&website, all_content_metadata).expect("Could not render tags");
+    
     all_post_metadata.sort_by_key(|post| {
         post.parse_date()
     });

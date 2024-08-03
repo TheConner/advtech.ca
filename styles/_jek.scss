@@ -11,6 +11,21 @@ body {
   font-family: 'Noto Sans', sans-serif;
 }
 
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+header {
+  min-height: 50px;
+}
+
+footer {
+  min-height: 50px;
+}
+
 
 a {
   color: inherit;
@@ -53,8 +68,10 @@ img {
   .nav {
     margin-right: 100px;
   }
+}
 
-
+nav {
+  margin-bottom: 32px;
 }
 
 .zoom:hover {
@@ -204,8 +221,6 @@ canvas {
 .map3 {
   background: url('/assets/img/sprites/map3.png');
 }
-
-
 
 .title {
   text-align: center;
