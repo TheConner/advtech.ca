@@ -10,6 +10,7 @@ body {
   background-color: map-get($stone, 800);
   color: map-get($gray, 50);
   font-family: 'IBMPlexSerif', serif;
+  font-size: $base_font_size;
 
   min-height: 100vh;
   margin: 0;
@@ -26,9 +27,14 @@ footer {
 }
 
 a {
-  color: inherit;
+  color: map-get($stone, 400);
   text-decoration: none;
+
+  h1, h2, h3, h4 {
+    color: map-get($gray, 50);
+  }
 }
+
 
 a:hover {
   text-decoration: underline;

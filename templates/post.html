@@ -6,19 +6,24 @@
     
     
     {% set tag_len = tags | length %}
-    <p class="subtitle">
     {% if metadata.date %}
-      Date: {{ metadata.date | date(format="%B %d %Y")}}
+    <p class="subtitle my-none">
+      {{ metadata.date | date(format="%B %d %Y")}}
+    </p>
     {% endif %}
+
     {% if tag_len > 0 %}
-        
-        Tags: 
+      <p class="subtitle my-none">
+        Tags:
         {% for tag in tags %}
           <a href="/tags/{{tag}}">{{tag}}</a>
         {% endfor %}
+      </p>
     {% endif %}
-    </p>
     
-    {{ content | safe }}
+    
+    <div class="mt-sm">
+      {{ content | safe }}
+    </div>
   </article>
 {% endblock %}

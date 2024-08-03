@@ -1,7 +1,7 @@
 @use 'variables' as *;
 
 nav {
-  color: map-get($map: $slate, $key: 100);
+  color: map-get($map: $stone, $key: 300);
   a:not(:last-child) {
     margin-right: 8px;
   }
