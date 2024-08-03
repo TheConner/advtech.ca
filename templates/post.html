@@ -3,15 +3,21 @@
 {% block content %}
   <article>
     <h1>{{ title }}</h1>
+    
+    
     {% set tag_len = tags | length %}
+    <p class="subtitle">
+    {% if metadata.date %}
+      Date: {{ metadata.date | date(format="%B %d %Y")}}
+    {% endif %}
     {% if tag_len > 0 %}
-      <p class="subtitle">
+        
         Tags: 
         {% for tag in tags %}
           <a href="/tags/{{tag}}">{{tag}}</a>
         {% endfor %}
-      </p>
     {% endif %}
+    </p>
     
     {{ content | safe }}
   </article>

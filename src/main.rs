@@ -36,7 +36,7 @@ fn main() {
 }
 
 fn render(website: Website) -> io::Result<()> {
-    clear_output().expect("Could not clear output");
+    clear_output().ok();
 
     render_styles()?;  
 

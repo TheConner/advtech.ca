@@ -16,8 +16,7 @@
 <body>
     <header>
     {% block header %}
-    <pre class="logo-bg"><code class="logo">
-      .o.       oooooooooo.   oooooo     oooo ooooooooooooo                     oooo        
+    <pre class="logo-bg"><code class="logo">      .o.       oooooooooo.   oooooo     oooo ooooooooooooo                     oooo        
      .888.      `888'   `Y8b   `888.     .8'  8'   888   `8                     `888        
     .8"888.      888      888   `888.   .8'        888       .ooooo.   .ooooo.   888 .oo.   
    .8' `888.     888      888    `888. .8'         888      d88' `88b d88' `"Y8  888P"Y88b  
@@ -30,9 +29,6 @@ o88o     o8888o o888bood8P'         `8'           o888o     `Y8bod8P' `Y8bod8P' 
     <nav class="nav">
         {% for entry in nav_entries %}
             <a href="{{ entry.slug }}">{{ entry.name }}</a>
-            {% if loop.last != true %}
-                <span>|</span>
-            {% endif %}
         {% endfor %}
     </nav>
     {% endblock nav %}

@@ -1,6 +1,5 @@
 @use 'variables' as *;
-
-$logo_background: $current_line;
+@use 'sass:map';
 
 .logo {
   // Use small text
@@ -8,8 +7,8 @@ $logo_background: $current_line;
   // USe cultive font
   font-family: 'Glass TTY VT220';
   display: block;
-  color: $foreground;
-  background-color: $logo_background;
+  color: map-get($stone, 100);
+  background-color: map-get($stone, 600);
   // Padding
   padding: 0.5rem;
   margin: 0;
@@ -20,7 +19,7 @@ $logo_background: $current_line;
 }
 
 .logo-bg {
-  background-color: $logo_background;
+  border-radius: 8px;
 }
 
 // Phone media breakpoint

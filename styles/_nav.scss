@@ -1,0 +1,8 @@
+@use 'variables' as *;
+
+nav {
+  color: map-get($map: $slate, $key: 100);
+  a:not(:last-child) {
+    margin-right: 8px;
+  }
+}

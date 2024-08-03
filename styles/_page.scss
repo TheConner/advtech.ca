@@ -1,0 +1,103 @@
+/**
+ * CSS here is a modified version of the Jek theme 
+ * https://github.com/tcbutler320/jek
+ */
+
+@use 'variables' as *;
+@use 'sass:map';
+
+body {
+  background-color: map-get($stone, 800);
+  color: map-get($gray, 50);
+  font-family: 'IBMPlexSerif', serif;
+
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+header {
+  min-height: 50px;
+}
+
+footer {
+  min-height: 50px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  width: 100%;
+}
+
+@media only screen and (min-device-width : 320px) and (max-device-width : 767px) {
+  /* body {
+      background-color: red;
+  } */
+
+  body {
+    margin: auto;
+    width: 90%;
+  }
+
+  .nav {
+    margin-right: 10px;
+  }
+}
+
+
+@media only screen and (min-device-width : 768px) {
+  /* body {
+      background-color: blue;
+  } */
+
+  body {
+    margin: auto;
+    width: 60%;
+  }
+
+  .nav {
+    margin-right: 100px;
+  }
+}
+
+nav {
+  margin-bottom: 32px;
+}
+
+.zoom:hover {
+  transform: scale(1.5);
+  /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+}
+
+code {
+  overflow-x: auto;
+  background-color: map-get($map: $slate, $key: 400);
+  border-radius: 5px;
+  color: map-get($map: $slate, $key: 50);
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  display: block;
+  overflow-x: auto;
+}
+
+blockquote {
+  margin: 0;
+  padding-left: 1.4rem;
+  border-left: 2px solid black;
+}
+
+.title {
+  text-align: center;
+}

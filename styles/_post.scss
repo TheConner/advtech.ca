@@ -1,13 +1,19 @@
+@use 'variables' as *;
+@use 'sass:map';
+
 article {
-  h1.title {
+  h1 {
     margin-bottom: 0px;
+    color: map-get($map: $gray, $key: 100);
   }
 
   .subtitle {
     font-size: 14px;
   }
+
+  font-size: 16px;
 }
 
-article {
-
+.subtitle {
+  color: map-get($map: $gray, $key: 400);
 }

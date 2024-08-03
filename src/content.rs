@@ -146,6 +146,7 @@ impl Post {
 
         // If this post is a draft, only continue if include_draft is set
         if metadata.is_draft() && !include_draft {
+            println!("--> draft mode, skip");
             return Ok(());
         }
 
@@ -166,6 +167,7 @@ impl Post {
         context.insert("content", &html);
         context.insert("title", &metadata.title);
         context.insert("tags", &metadata.tags);
+        context.insert("metadata", &metadata);
 
         let rendered_post = TEMPLATES.render("post.html", &context).unwrap();
 
@@ -249,7 +251,7 @@ pub fn render_styles() -> io::Result<()> {
     // TODO: make this less jank
     copy_dir_all("./styles/font/glasstty", "./output/font")
         .expect("Copying rendered styles blew up");
-    copy_dir_all("./styles/font/fantasque", "./output/font/fantasque")
+    copy_dir_all("./styles/font/ibm_plex_serif", "./output/font")
         .expect("Copying rendered styles blew up");
 
     let mut out_file = File::create(out_path.join(Path::new("main.css")))?;
