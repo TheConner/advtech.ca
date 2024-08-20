@@ -3,6 +3,9 @@ use comrak::nodes::NodeValue;
 use comrak::parse_document;
 use comrak::Arena;
 use regex::Regex;
+use serde::Deserialize;
+use serde::Serialize;
+use std::borrow::BorrowMut;
 use std::collections::HashMap;
 use std::fs;
 use std::fs::File;
@@ -35,17 +38,12 @@ pub fn clear_output() -> io::Result<()> {
     fs::remove_dir_all(Path::new("./output"))
 }
 
-pub fn render_content(base_dir: &Path, website: &Website) -> Vec<PostMetadata> {
-    let posts = get_renderable_files(base_dir).map(|x| Post::new(x));
-
-    let mut post_metadatas = vec![];
-    for mut post in posts {
-        post.render(&website, false).expect("Could not render post");
-        if let Some(meta) = post.metadata {
-            post_metadatas.push(meta);
-        }
-    }
-    post_metadatas
+pub fn render_content<'a>(base_dir: &'a Path, website: &'a Website) -> impl Iterator<Item = Post> + 'a {
+    get_renderable_files(base_dir).map(move |x| {
+        let mut post = Post::new(x);
+        post.render(website, false).expect("error rendering post");
+        post
+    })
 }
 
 struct SplitPost {
@@ -72,9 +70,12 @@ fn extract_header(text: &str) -> Option<SplitPost> {
     None
 }
 
-struct Post {
+#[derive(Debug, Serialize)]
+pub struct Post {
+    #[serde(skip_serializing)]
     file: DirEntry,
     assets: HashMap<PathBuf, PathBuf>,
+    pub content: Option<String>,
     pub metadata: Option<PostMetadata>,
 }
 
@@ -84,6 +85,7 @@ impl Post {
             file: file,
             metadata: None,
             assets: HashMap::new(),
+            content: None
         }
     }
 
@@ -98,7 +100,7 @@ impl Post {
         self.assets.insert(path.clone(), out_path);
     }
 
-    fn render_md(&mut self, document: &str) -> String {
+    fn render_md(&mut self, document: &str) {
         let arena = Arena::new();
 
         let mut options = Options::default();
@@ -123,7 +125,8 @@ impl Post {
         let mut html = vec![];
         format_html(root, &options, &mut html).unwrap();
 
-        String::from_utf8(html).unwrap()
+        let content = String::from_utf8(html).unwrap();
+        self.content = Some(content.clone());
     }
 
     /// Renders a post
@@ -161,10 +164,10 @@ impl Post {
             }
         }
 
-        let html = self.render_md(&split_post.body);
+        self.render_md(&split_post.body);
         let mut context = website.render_context();
 
-        context.insert("content", &html);
+        context.insert("content", &self.content.as_ref().unwrap());
         context.insert("title", &metadata.title);
         context.insert("tags", &metadata.tags);
         context.insert("metadata", &metadata);
@@ -197,7 +200,10 @@ impl Post {
     }
 }
 
-pub fn render_tags(website: &Website, posts: Vec<PostMetadata>) -> io::Result<()> {
+pub fn render_tags<I>(website: &Website, posts: I) -> io::Result<()> 
+where
+    I: Iterator<Item = PostMetadata>,
+{
     // Reduce all tags into a map of tag -> [post]
     let mut tag_map: HashMap<String, Vec<PostMetadata>> = HashMap::new();
 
@@ -230,15 +236,40 @@ pub fn render_tags(website: &Website, posts: Vec<PostMetadata>) -> io::Result<()
     Ok(())
 }
 
-pub fn render_index(website: &Website, posts: Vec<PostMetadata>) -> io::Result<()> {
+pub fn render_index(website: &Website, posts: &Vec<PostMetadata>) -> io::Result<()> {
     let mut context = website.render_context();
-    context.insert("posts", &posts);
+    context.insert("posts", posts);
     let rendered = TEMPLATES.render("home.html", &context).unwrap();
     let base_output_path = Path::new("./output");
     fs::create_dir_all(base_output_path).expect("Could not create base output path");
     let mut out_file = File::create(base_output_path.join(Path::new("index.html")))?;
     out_file.write_all(rendered.as_bytes())?;
 
+    Ok(())
+}
+
+pub fn render_atom(website: &Website, posts: &Vec<Post>) -> io::Result<()> {
+    let mut context = website.render_context();
+    context.insert("posts", posts);
+
+    let last_updated = posts.iter()
+        .filter(|post| post.metadata.is_some())
+        .max_by_key(|x| x.metadata.as_ref().unwrap().parse_date());
+
+    if let Some(last_updated) = last_updated {
+        context.insert("last_modified", &last_updated.metadata
+            .as_ref()
+            .unwrap()
+            .parse_date()
+            .unwrap()
+            .to_string());
+    }
+    
+    let rendered = TEMPLATES.render("atom.xml", &context).expect("oh");
+    let base_output_path = Path::new("./output");
+    fs::create_dir_all(base_output_path).expect("Could not create base output path");
+    let mut out_file = File::create(base_output_path.join(Path::new("atom.xml")))?;
+    out_file.write_all(rendered.as_bytes())?;
     Ok(())
 }
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title>{{ website_name }}</title>
+  <link href="/atom.xml" rel="self" />
+  <link href="{{ website_base_href }}" />
+  <updated>{{ last_modified | date(format="%+") }}</updated>
+  <author>
+    <name>{{author_given_name}} {{author_family_name}}</name>
+  </author>
+  <id>{{ website_base_href }}</id>
+  {% for post in posts %}
+    {% if post.metadata and not post.metadata.internal %}
+    <entry>{% set post_abs_url = website_base_href ~ "/" ~ post.metadata.slug %}
+      <title>{{ post.metadata.title }}</title>
+      <link href="{{ post_abs_url }}"></link>
+      {% if post.metadata.date %}
+      <updated>{{ post.metadata.date | date(format="%+") }}</updated>
+      {% endif %}
+      <id>{{ post_abs_url }}</id>
+      <content type="html">
+        {{ post.content }}
+      </content>
+    </entry>
+    {% endif %}
+  {% endfor %}
+</feed>

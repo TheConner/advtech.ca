@@ -3,8 +3,10 @@ use std::io;
 use std::path::Path;
 
 use config::PostMetadata;
+use content::render_atom;
 use content::render_styles;
 use content::render_tags;
+use content::Post;
 
 mod config;
 mod content;
@@ -40,29 +42,31 @@ fn render(website: Website) -> io::Result<()> {
 
     render_styles()?;  
 
-    let all_content_metadata = render_content(&Path::new("./content"), &website);
+    let all_content: Vec<Post> = render_content(&Path::new("./content"), &website).collect();
     
-    let mut all_post_metadata: Vec<PostMetadata> = all_content_metadata.iter()
-        .cloned()
+    let mut all_content_meta: Vec<PostMetadata> = all_content.iter()
+        .filter(|post| post.metadata.is_some())
         .filter(|post| {
-            if let Some(internal) = post.internal {
-                !internal
-            } else {
-                true
+            let metadata = post.metadata.as_ref().unwrap();
+            if let Some(internal) = metadata.internal {
+                return !internal;
             }
+            return true;
         })
+        .map(|post| post.metadata.clone().unwrap())
         .collect();
 
     // All posts rendered, render tag summary pages
-    render_tags(&website, all_content_metadata).expect("Could not render tags");
+    render_tags(&website, all_content_meta.clone().into_iter()).expect("Could not render tags");
     
-    all_post_metadata.sort_by_key(|post| {
+    all_content_meta.sort_by_key(|post| {
         post.parse_date()
     });
 
-    all_post_metadata.reverse();
+    all_content_meta.reverse();
 
-    render_index(&website, all_post_metadata).expect("Fuck");
+    render_index(&website, &all_content_meta).expect("Fuck");
+    render_atom(&website, &all_content).expect("Ouch");
 
     Ok(())
 }
